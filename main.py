@@ -131,7 +131,7 @@ def votos_titulo(titulo_de_la_filmacion:str):
 # definimos
 def get_actor(nombre_actor:str):
     # Filtrar el DataFrame de cast para obtener las filas donde aparece el actor
-    peliculas_con_actor = data_nvp_actor[data_nvp_actor['prtgnst_name'].str.contains(nombre_actor, case=False, na=False)]
+    peliculas_con_actor = data_mvp_actor[data_mvp_actor['prtgnst_name'].str.contains(nombre_actor, case=False, na=False)]
     
     if peliculas_con_actor.empty:
         return f"No se encontraron películas para el actor: {nombre_actor}"
@@ -187,4 +187,6 @@ def recomendacion_pelicula(titulo_pelicula: str):
         recomendacion_subset[["vecino_title"]].reset_index().drop_duplicates()
     )
     pelicula_recomend = list(pelicula_vecinos["vecino_title"])
-    return {"pelicula": titulo_pelicula, "recomendaciones": pelicula_recomend}
+    return {"pelicula": titulo_pelicula, "recomendaciones": pelicula_recomend[:5]}
+
+    
