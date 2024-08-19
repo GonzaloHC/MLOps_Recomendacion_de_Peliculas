@@ -4,26 +4,15 @@ from fastapi import FastAPI
 
 # cargamos los datos
 data_mvp_funciones = pd.read_csv(
-<<<<<<< HEAD
-    os.path.join("data_prcssng", "D:\Bootcamp\Henry\CURSO\Proyecto Individual 1\Movies\Output", "data_mvp_final_funciones.csv"),
+    os.path.join("Output", "data_mvp_final_funciones.csv"),
     index_col=0,
 ).convert_dtypes()
 data_mvp_director = pd.read_csv(
-    os.path.join("data_prcssng", "D:\Bootcamp\Henry\CURSO\Proyecto Individual 1\Movies\Output", "data_mvp_final_funciones_exitodir.csv"),
+    os.path.join("Output", "data_mvp_final_funciones_exitodir.csv"),
     index_col=0,
 ).convert_dtypes()
 data_mvp_recomendacion = pd.read_csv(
-    os.path.join("data_prcssng", "D:\Bootcamp\Henry\CURSO\Proyecto Individual 1\Movies\Output", "data_mvp_ml_recomend_indexed.csv"),
-    os.path.join("data_prcssng", "Ouput", "data_mvp_final_funciones.csv"),
-    index_col=0,
-).convert_dtypes()
-data_mvp_director = pd.read_csv(
-    os.path.join("data_prcssng", "Ouput", "data_mvp_final_funciones_exitodir.csv"),
-    index_col=0,
-).convert_dtypes()
-data_mvp_recomendacion = pd.read_csv(
-    os.path.join("data_prcssng", "Ouput", "data_mvp_ml_recomend_indexed.csv"),
->>>>>>> e2e03bd8f24770032636e707e7beb59dfbe555c0
+    os.path.join("Output", "data_mvp_ml_recomend_indexed.csv"),
     index_col=[0, 1],
 ).convert_dtypes()
 
@@ -107,7 +96,7 @@ def director_exitoso(director: str):
     director_return = director_subset["director_return"].drop_duplicates()
     director_return_res = round(float(director_return.iloc[0]), 2)
     columns_peliculas = [
-        "movie_id",
+        "pelicula_id",
         "title",
         "release_date",
         "budget",
