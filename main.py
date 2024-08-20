@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 # cargamos los datos
 data_mvp_funciones = pd.read_csv(
-    os.path.join("Output", "data_mvp_final_funciones.csv"),
+    os.path.join("Pipeline", "data_movies_subset_limpia.csv"),
     index_col=0,
 ).convert_dtypes()
 data_mvp_funciones_final = pd.read_csv(
@@ -29,7 +29,7 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    return {"message": "API del proyecto: Henry PI_MLOPS, por GonzaloH"}
+    return {"message": "API del proyecto:PI_MLOPS Henry, por GonzaloH"}
 
 @app.get("/cantidad_filmaciones_mes/{mes}")
 # definimos
@@ -58,7 +58,6 @@ def cantidad_filmaciones_mes(mes: str):
     
     # Devolver la cantidad de filmaciones en ese mes
     return f"{len(peliculas_mes)} cantidad de peliculas fueron estrenadas en el mes de {mes}"
-
 
 @app.get("/cantidad_filmaciones_dia/{dia}")
 # definimos
@@ -90,41 +89,47 @@ def cantidad_filmaciones_dia(dia: str):
 
 @app.get("/score_titulo/{titulo_de_la_filmación}")
 # definimos
-def score_titulo(titulo_de_la_filmacion: str):
-    # Filtrar el DataFrame por el título de la filmación
-    filmacion = data_mvp_funciones_final[data_mvp_funciones_final['title'].str.lower() == titulo_de_la_filmacion.lower()]
-
-    if filmacion.empty:
-        return "Título no encontrado."
-
-    # Obtener el título, año de estreno y score
-    titulo = filmacion['title'].values[0]
-    anio_estreno = filmacion['release_year'].values[0]
-    score = filmacion['popularity'].values[0]
-
-    return f'La pelicula {titulo} fue estrenado en el año {anio_estreno} con un score/popularidad de {score}'
+def score_titulo(titulo_de_la_filmacion):
+    # Convertir el título ingresado a minúsculas
+    titulo_de_la_filmacion = titulo_de_la_filmacion.lower()
+    
+    # Filtrar el dataset buscando coincidencias en el título
+    resultados = data_mvp_funciones[data_mvp_funciones['title'].str.lower().str.contains(titulo_de_la_filmacion, na=False)]
+    
+    # Crear una lista de diccionarios con el formato {'título': title, 'año': release_year, 'popularidad': popularity}
+    lista_resultados = [
+        {'Título': row['title'], 'Año de estreno': row['release_year'], 'Popularidad': row['popularity']} 
+        for _, row in resultados.iterrows()
+    ]
+    
+    return lista_resultados
 
 
 @app.get("/votos_titulo/{titulo_de_la_filmación}")
 # definimos
-def votos_titulo(titulo_de_la_filmacion:str):
-    # Filtrar el DataFrame por el título de la filmación
-    filmacion = data_mvp_funciones_final[data_mvp_funciones_final['title'].str.lower() == titulo_de_la_filmacion.lower()]
-
-    if filmacion.empty:
-        return "Título no encontrado."
-
-    # Obtener la cantidad de votos y el valor promedio de las votaciones
-    cantidad_votos = filmacion['vote_count'].values[0]
-    promedio_votaciones = filmacion['vote_average'].values[0]
-    anio_estreno = filmacion['release_year'].values[0]
-    titulo_peicula = filmacion['title'].values[0]
-
-    # Verificar si la cantidad de votos es al menos 2000
-    if cantidad_votos < 2000:
-        return "La filmación no tiene suficientes valoraciones (menos de 2000)."
-
-    return f'La pelicula {titulo_peicula} fue estrenada en el año {anio_estreno}. La misma cuenta con {cantidad_votos} valoraciones, con un promedio {promedio_votaciones}.'
+def votos_titulo(titulo_de_la_filmacion):
+    # Filtrar por coincidencias en el título, ignorando mayúsculas/minúsculas
+    coincidencias = data_mvp_funciones[data_mvp_funciones['title'].str.contains(titulo_de_la_filmacion, case=False, na=False)]
+    
+    # Lista para almacenar los resultados
+    resultados = []
+    
+    # Recorrer las coincidencias y filtrar por aquellas que tienen al menos 2000 votos
+    for _, row in coincidencias.iterrows():
+        if row['vote_count'] >= 2000:
+            resultado = {
+                'Título': row['title'],
+                'Año de estreno': row['release_year'],
+                'Cantidad de votos': row['vote_count'],
+                'Puntaje promedio': row['vote_average']
+            }
+            resultados.append(resultado)
+    
+    # Verificar si se encontraron películas que cumplan con la condición
+    if resultados:
+        return resultados
+    else:
+        return "No se encontraron películas con al menos 2000 valoraciones."
 
 
 @app.get("/get_actor/{nombre_actor}")
@@ -149,7 +154,7 @@ def get_actor(nombre_actor:str):
     retorno_total = df_actor_movies['return'].sum()
     promedio_retorno = df_actor_movies['return'].mean()
     
-    return f'El actor {nombre_actor} ha participado en {cantidad_peliculas} cantidad de filmaciones, el mismo a conseguido un retorno de {retorno_total} con un promedio {promedio_retorno} por filmación.'
+    return f'El actor {nombre_actor} ha participado en {cantidad_peliculas} cantidad de filmaciones, el mismo a conseguido un retorno de {round(retorno_total,2)} con un promedio {round(promedio_retorno,2)} por filmación.'
 
 
 @app.get("/get_director/{nombre_director}")
