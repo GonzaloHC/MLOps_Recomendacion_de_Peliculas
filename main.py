@@ -161,7 +161,7 @@ def get_actor(nombre_actor:str):
 # definimos
 def get_director(nombre_director: str):
     director_subset = data_mvp_director.loc[
-        data_mvp_director['director'].str.contains(nombre_director)]
+        data_mvp_director['director'].str.contains(nombre_director,case=False, na=False)]
     director_return = director_subset['director_return'].drop_duplicates()
     director_return_res = round(float(director_return.iloc[0]),2)
     columns_peliculas=['movie_id','title','release_date','budget','revenue','return']
