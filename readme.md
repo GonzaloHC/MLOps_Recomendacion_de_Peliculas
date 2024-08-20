@@ -104,7 +104,7 @@ El proyecto se ha desplegado utilizando [Render](https://render.com/), una plata
 
 1. Enlaces Resumen
 
-- Api: [Despliegue en Render](https://mlops-recomendacion-de-peliculas-14.onrender.com/docs).
+- Api: [Despliegue en Render](https://mlops-recomendacion-de-peliculas-gonzalo.onrender.com/docs).
 - Clonar repositorio:
    ```bash
    git clone https://github.com/GonzaloHC/MLOps_Recomendacion_de_Peliculas.git
